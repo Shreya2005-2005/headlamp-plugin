@@ -89,3 +89,50 @@ export function SecurityExceptionDetail() {
     </>
   );
 }
+
+export function SecurityExceptionEvents({ name, namespace }: { name: string; namespace: string }) {
+  const clusters = useHLSelectedClusters();
+  const cluster = clusters?.[0] ?? '';
+
+  const [events] = useK8sObjectList({
+    cluster,
+    group: '',
+    version: 'v1',
+    resource: 'events',
+    namespace,
+    queryParams: {
+      fieldSelector: `involvedObject.name=${name},involvedObject.namespace=${namespace}`,
+    },
+  });
+
+  const matchEvents = (events ?? []).filter(
+    (e: any) => e.reason === 'ExceptionMatched' || e.reason === 'SecurityExceptionChanged'
+  );
+
+  return (
+    <SectionBox title="Exception Events">
+      {matchEvents.length === 0 ? (
+        <Typography variant="body2" color="text.secondary">
+          No events yet. Events appear here when this exception is matched during a kubescape scan
+          or when the resource changes and triggers a rescan.
+        </Typography>
+      ) : (
+        <Stack spacing={1}>
+          {matchEvents.map((e: any, i: number) => (
+            <Stack key={i} direction="row" spacing={2} alignItems="center">
+              <Chip
+                label={e.reason}
+                size="small"
+                color={e.reason === 'ExceptionMatched' ? 'success' : 'info'}
+              />
+              <Typography variant="body2">{e.message}</Typography>
+              <Typography variant="caption" color="text.secondary">
+                {new Date(e.lastTimestamp).toLocaleString()}
+              </Typography>
+            </Stack>
+          ))}
+        </Stack>
+      )}
+    </SectionBox>
+  );
+}
