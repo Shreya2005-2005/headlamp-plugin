@@ -223,6 +223,34 @@ registerRoute({
   name: RoutingName.ExceptionGroups,
 });
 
+// SecurityException CRD routes (lfx-2026-security-exception-crd)
+import { SecurityExceptionList } from "./exceptions/SecurityExceptionList";
+registerRoute({
+  path: "/kubescape/security-exceptions",
+  sidebar: { name: "security-exceptions", label: "CRD Exceptions", parent: "kubescape" },
+  component: () => <SecurityExceptionList />,
+  exact: true,
+  name: "SecurityExceptions",
+});
+
+import { SecurityExceptionDetail } from "./exceptions/SecurityExceptionDetail";
+registerRoute({
+  path: "/kubescape/security-exceptions/:namespace/:name",
+  sidebar: null,
+  component: () => <SecurityExceptionDetail />,
+  exact: true,
+  name: "SecurityExceptionDetail",
+});
+
+import { SecurityExceptionCreate } from "./exceptions/SecurityExceptionCreate";
+registerRoute({
+  path: "/kubescape/security-exceptions/new",
+  sidebar: null,
+  component: () => <SecurityExceptionCreate />,
+  exact: true,
+  name: "SecurityExceptionCreate",
+});
+
 import KubescapeWorkloadConfigurationScanFixes from './compliance/WorkloadScanFixes';
 
 registerRoute({
